@@ -2,6 +2,12 @@ import java.io.*;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Scanner;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JFrame;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.image.BufferedImage;
 public class Engine {
 	public static int[] sample(ArrayList<vector> vecArray, int height, int width, RayCast game) {
 		int[] distances = new int[width];
@@ -81,6 +87,31 @@ public class Engine {
 	
 	}
 
+	public static BufferedImage drawImage(int[] heights, int width, int height) {
+		BufferedImage toDraw = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		//int[][] heightMap = new int[width][height];	
+		for (int i = 0; i < heights.length; i++) {
+			int currHeight = heights[i];
+			int index = (height - currHeight)/2;
+			int j;
+			for (j = 0; j < currHeight; j++) {
+				//heightMap[i][j + index] = 1;
+				//System.out.println(i + " " + (j + index));
+				toDraw.setRGB(i, j + index, 255);
+			}
+
+			for (; j + index < height; j++) {
+				//heightMap[i][j + index] = 2;
+				toDraw.setRGB(i, j + index, 35);
+			}
+		}
+		return toDraw;
+	}
+/*
+	public static void paint(BufferedImage toDraw) {
+
+	}
+*/
 	public static void printMap(int[] heights, int width, int height) {
 		//boolean evenWidth = width % 2 == 0;
 		int[][] heightMap = new int[width][height];
@@ -191,12 +222,18 @@ public class Engine {
 			System.out.print(lengths[i] + " " );
 		}
 		Scanner input = new Scanner(System.in);
+		JFrame frame = new JFrame();
 
 		while (true) {
 			//System.out.println(currGame.xPos + " " + currGame.yPos + " " + currGame.getAngle());
 			//System.out.println(currGame);
 			//System.out.println(currGame.angles[currGame.angleIndex] + " " + currGame.vectors[currGame.angleIndex]);
-			printMap(lengths, width, height);
+			//printMap(lengths, width, height);
+			frame.setContentPane(new Container());
+			frame.getContentPane().setLayout(new FlowLayout());
+			frame.getContentPane().add(new JLabel(new ImageIcon(drawImage(lengths, width, height))));
+			frame.pack();
+			frame.setVisible(true);
 			char nextMove = input.next().charAt(0);
 			turn(currGame, nextMove);
 			move(currGame, nextMove);
