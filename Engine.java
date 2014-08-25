@@ -7,8 +7,17 @@ import javax.swing.JLabel;
 import javax.swing.JFrame;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
-public class Engine {
+
+public class Engine implements KeyListener {
+	char nextMove;	
+	int[] lengths;
+	RayCast game;
+	JFrame frame;
+	int height;
+	int width;
+
 	public static int[] sample(ArrayList<vector> vecArray, int height, int width, RayCast game) {
 		int[] distances = new int[width];
 		double step = (double) (vecArray.size()-0.0001)/(double) width;
@@ -186,6 +195,38 @@ public class Engine {
 		game.setPosition(newX, newY);
 	}
 
+	@Override
+	public void keyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+			case KeyEvent.VK_A: this.nextMove = 'a';
+								   break;
+			case KeyEvent.VK_D: this.nextMove = 'd';
+								   break;
+			case KeyEvent.VK_W: this.nextMove = 'w';
+								 break;
+			case KeyEvent.VK_S: this.nextMove = 's';
+								   break;
+			default: this.nextMove = 'c';
+		}
+		System.out.println(e.getKeyCode() + " " + this.nextMove);
+		turn(game, nextMove);
+		move(game, nextMove);
+		lengths = sample(game.drawVectors(400), height, width, game);		
+        this.frame.setContentPane(new Container());
+        this.frame.getContentPane().setLayout(new FlowLayout());
+        this.frame.getContentPane().add(new JLabel(new ImageIcon(drawImage(this.lengths, width, height))));
+        this.frame.pack();
+        this.frame.setVisible(true);
+	}
+
+	public void keyTyped(KeyEvent e) {
+
+	}
+
+	public void keyReleased(KeyEvent e) {
+
+	}
+
 	public static void main(String[] args) {
 		int width = 0;
 		int height = 0;	
@@ -217,13 +258,25 @@ public class Engine {
 		ArrayList<vector> seen = currGame.drawVectors(400);
 		System.out.println(currGame);
 		System.out.println(seen);
-		int[] lengths = sample(seen, height, width, currGame);
-		for (int i = 0; i < lengths.length; i++) {
-			System.out.print(lengths[i] + " " );
+		Engine engine = new Engine();
+		engine.game = currGame;
+		engine.lengths = sample(seen, height, width, currGame);
+		engine.height = height;
+		engine.width = width;
+		//int[] lengths = sample(seen, height, width, currGame);
+		for (int i = 0; i < engine.lengths.length; i++) {
+			System.out.print(engine.lengths[i] + " " );
 		}
 		Scanner input = new Scanner(System.in);
-		JFrame frame = new JFrame();
+		engine.frame = new JFrame();
+		engine.frame.setContentPane(new Container());
+		engine.frame.getContentPane().setLayout(new FlowLayout());
+		engine.frame.getContentPane().add(new JLabel(new ImageIcon(drawImage(engine.lengths, width, height))));
+		engine.frame.pack();
+		engine.frame.setVisible(true);
+		engine.frame.addKeyListener(engine);
 
+/*
 		while (true) {
 			//System.out.println(currGame.xPos + " " + currGame.yPos + " " + currGame.getAngle());
 			//System.out.println(currGame);
@@ -234,11 +287,12 @@ public class Engine {
 			frame.getContentPane().add(new JLabel(new ImageIcon(drawImage(lengths, width, height))));
 			frame.pack();
 			frame.setVisible(true);
-			char nextMove = input.next().charAt(0);
+		
+			//char nextMove = input.next().charAt(0);
 			turn(currGame, nextMove);
 			move(currGame, nextMove);
 			lengths = sample(currGame.drawVectors(400), height, width, currGame);		
 			//System.out.println(currGame.getAngle());
-		}
+		}*/
 	}
 }
